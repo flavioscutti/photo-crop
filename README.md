@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/634b0c79-13a7-4a66-9ac8-24161e8194a0" alt="Photo Crop logo" width="200">
+</p>
+
 # Photo Crop
 
 **Batch crop and straighten of analog photo scans, on Raspberry Pi.**
@@ -9,7 +13,7 @@ Written in Python with Tkinter, OpenCV, Pillow and exiftool. Dark, touchscreen-f
 <br>
 
 <p align="center">
-  <img src="screenshot.png" alt="Photo Crop main window" width="700">
+  <img src="https://github.com/user-attachments/assets/86a9a985-14d4-466f-8828-aff07414cf7b" alt="Photo Crop main window" width="700">
 </p>
 
 <br>
@@ -106,7 +110,7 @@ Scanning a shoebox of prints usually means scanning one photo at a time, then fi
 | Hardware | Raspberry Pi (developed and tested on a Raspberry Pi 4 with 8 GB of RAM) or any Linux PC |
 | Operating system | Raspberry Pi OS, or any Debian-based Linux distribution |
 | Python | Python 3 with Tkinter |
-| Python libraries | OpenCV 4 (`python3-opencv`), NumPy, Pillow 9.1 or newer (with ImageTk) |
+| Python libraries | OpenCV 4.5.4 or newer (the headless build is enough: the app never uses OpenCV's own GUI, the whole interface is Tkinter), NumPy 1.21 or newer, Pillow 9.1 or newer (with ImageTk) |
 | External tool | exiftool (strongly recommended: needed to copy DPI, ICC profile, EXIF, XMP and to write manual metadata) |
 | Font | Inter (package `fonts-inter`), used by the whole interface |
 | Display | Works with mouse and keyboard or on a touchscreen |
@@ -115,18 +119,31 @@ Scanning a shoebox of prints usually means scanning one photo at a time, then fi
 
 | Order | File | What it does |
 |---|---|---|
-| 1 | `install.sh` | Installs the dependencies with `apt` and warns if an external tool is missing |
-| 2 | `photo_crop.desktop` | Adds Photo Crop to the **Graphics** menu |
+| 1 | `install.sh` | Installation script for Raspberry Pi OS |
+| 2 | `requirements.txt` | Python dependencies and their minimum versions |
 | 3 | `photo_crop.py` | The application |
-| 4 | `.assets/logo.png` | Optional logo shown in the About window |
+| 4 | `.assets/logo.png` | Logo shown in the About window |
 | 5 | `README.md` | This file |
 | 6 | `LICENSE` | GNU GPL v3.0 |
+
+A ready-to-install **`.deb` package** is published on the [Releases page](https://github.com/flavioscutti/photo-crop/releases/tag/v1.6.7).
 
 The program creates one file of its own in your home folder: `~/.photo_crop_config.json` (see [Configuration file](#configuration-file)).
 
 ## Quick installation
 
-### Option A: clone the repository (recommended)
+### Option A: install the .deb package (recommended)
+
+Download the `.deb` file from the [v1.6.7 release](https://github.com/flavioscutti/photo-crop/releases/tag/v1.6.7), then install it with `apt` so that the dependencies are resolved automatically:
+
+```bash
+cd ~/Downloads
+sudo apt install ./photo-crop_*.deb
+```
+
+Photo Crop then appears in the **Graphics** menu. On some systems the menu refreshes only after logging out and back in, or after a reboot.
+
+### Option B: run from the source code
 
 ```bash
 git clone https://github.com/flavioscutti/photo-crop.git
@@ -143,7 +160,7 @@ cd ~/photo-crop
 git pull
 ```
 
-### Option B: create the files by hand
+### Option C: create the files by hand
 
 Install the dependencies:
 
@@ -165,23 +182,6 @@ Run it:
 python3 ~/photo-crop/photo_crop.py
 ```
 
-### Add Photo Crop to the application menu
-
-Create (or copy from the repository) a launcher in `~/.local/share/applications/photo_crop.desktop`:
-
-```ini
-[Desktop Entry]
-Name=Photo Crop
-Comment=Batch crop of analog photo scans
-Exec=sh -c 'python3 "$HOME/photo-crop/photo_crop.py"'
-Icon=camera-photo
-Terminal=false
-Type=Application
-Categories=Graphics;
-```
-
-The entry appears in the **Graphics** menu; on some systems the menu refreshes only after logging out and back in, or after a reboot.
-
 ### Other Linux distributions
 
 Install the same components with your package manager.
@@ -192,7 +192,7 @@ Install the same components with your package manager.
 | Fedora | `sudo dnf install python3-tkinter python3-opencv python3-numpy python3-pillow python3-pillow-tk perl-Image-ExifTool rsms-inter-fonts` |
 | Arch Linux | `sudo pacman -S tk python-opencv python-numpy python-pillow perl-image-exiftool inter-font` |
 
-If your distribution does not provide a package, `pip install opencv-python numpy pillow` also works. Without the Inter font Tkinter falls back to a default font and the layout may look slightly different.
+If your distribution does not provide a package, `pip install "opencv-python-headless>=4.5.4" "numpy>=1.21" "Pillow>=9.1.0"` also works. Without the Inter font Tkinter falls back to a default font and the layout may look slightly different.
 
 ## Usage
 
@@ -283,6 +283,10 @@ The log reports each case, for example `[AUTO->MANUAL] photo.tif: detected area 
 
 In Manual mode (and for the Auto review queue) the **Interactive Inspector** opens, titled `PRECISION CROP REVIEW: file name`. The window is created once and reused for the whole batch; its size and position are remembered. By default it fills the screen up to 1900 x 1010 pixels.
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2df5114e-ddf9-43b4-b1c9-9e8a374ad8f2" alt="Interactive Inspector window" width="800">
+</p>
+
 **Layout**
 
 - **Left half:** the whole rotated photo with the crop rectangle drawn in cyan. The four corner handles are shown as dots; the selected corner is larger and white.
@@ -334,6 +338,10 @@ All settings are stored in the configuration file and used for every batch until
 
 ### General tab
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/06419a02-eec5-4d11-bc7b-3051abf51bec" alt="Output Formats window, General tab" width="700">
+</p>
+
 **Save these formats together** - four toggles: **Same as original**, **JPEG**, **TIFF**, **PNG**.
 
 - **Same as original** keeps each file's own format: a JPEG scan produces a JPEG, a TIFF scan a TIFF, a PNG scan a PNG, a BMP scan a BMP, and the original extension is preserved.
@@ -361,6 +369,10 @@ The **(i)** button at the bottom opens the **About** window with logo, name, tag
 
 ### Metadata tab
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/110d0cce-0ebe-496b-a7dc-26d16193b9d7" alt="Output Formats window, Metadata tab" width="700">
+</p>
+
 Write your own metadata into every file of the batch. **Only filled fields are written; empty fields are ignored**, and the values you type override those copied from the original scan. The page scrolls with the mouse wheel or by dragging with a finger.
 
 | Section | Fields |
@@ -380,6 +392,10 @@ The exact tags written are listed in [Metadata handling](#metadata-handling).
 
 ### JPEG tab
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/45b38aaf-b79f-48e4-9bb1-819117eb492a" alt="Output Formats window, JPEG tab" width="700">
+</p>
+
 | Setting | Options |
 |---|---|
 | **As original** | When the source is a JPEG, uses its quality level, chroma subsampling and progressive flag; for any other source the values shown here are used. While on, the compression controls are greyed out (their values stay visible) |
@@ -396,6 +412,10 @@ JPEG is always 8-bit: 16-bit scans are converted to 8-bit for this format.
 
 ### TIFF tab
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/178084a0-7b65-4e03-b353-41803253cf29" alt="Output Formats window, TIFF tab" width="700">
+</p>
+
 | Setting | Options |
 |---|---|
 | **As original** | When the source is a TIFF, uses its compression method (when it can be read); otherwise the value shown |
@@ -407,6 +427,10 @@ JPEG is always 8-bit: 16-bit scans are converted to 8-bit for this format.
 The compression slider needs an OpenCV build that can set the TIFF compression. If yours cannot, the slider is disabled and the window says so.
 
 ### PNG tab
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/98aae3c5-16ab-4fd5-8886-7f1d645116dd" alt="Output Formats window, PNG tab" width="700">
+</p>
 
 | Setting | Options |
 |---|---|
