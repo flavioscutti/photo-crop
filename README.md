@@ -132,7 +132,33 @@ The program creates one file of its own in your home folder: `~/.photo_crop_conf
 
 ## Quick installation
 
-### Option A: install the .deb package (recommended)
+### Option A: install from the APT repository (recommended)
+
+This is the cleanest way to install Photo Crop on Debian, Ubuntu or Raspberry Pi OS. It allows you to receive updates automatically with `sudo apt upgrade`.
+
+Copy and paste the following three commands in a terminal:
+
+# 1. Add the GPG key
+```bash
+curl -fsSL https://flavioscutti.github.io/photo-crop/public.key | sudo gpg --dearmor -o /usr/share/keyrings/photo-crop.gpg
+```
+
+# 2. Add the repository
+```bash
+echo "deb [signed-by=/usr/share/keyrings/photo-crop.gpg] https://flavioscutti.github.io/photo-crop stable main" | sudo tee /etc/apt/sources.list.d/photo-crop.list
+```
+# 3. Install Photo Crop
+```****
+sudo apt update
+sudo apt install photo-crop
+```
+Photo Crop is now installed and appears in the Graphics menu. To update it in the future, simply run:
+
+```bash
+sudo apt update && sudo apt upgrade
+```
+
+### Option B: install the .deb package
 
 Download the `.deb` file from the [v1.6.7 release](https://github.com/flavioscutti/photo-crop/releases/tag/v1.6.7), then install it with `apt` so that the dependencies are resolved automatically:
 
@@ -142,8 +168,9 @@ sudo apt install ./photo-crop_*.deb
 ```
 
 Photo Crop then appears in the **Graphics** menu. On some systems the menu refreshes only after logging out and back in, or after a reboot.
+```
 
-### Option B: run from the source code
+### Option C: run from the source code
 
 ```bash
 git clone https://github.com/flavioscutti/photo-crop.git
