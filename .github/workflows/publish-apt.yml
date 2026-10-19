@@ -1,0 +1,57 @@
+name: Publish APT Repository
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Download .deb files from Release
+        run: |
+          mkdir -p incoming
+          # Scarica i .deb allegati alla Release corrente
+          gh release download ${{ github.event.release.tag_name }} --pattern "*.deb" --dir incoming
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create APT repository
+        uses: morph027/apt-repo-action@v3
+        id: create-apt-repo
+        with:
+          repo-name: photo-crop
+          scan-dir: incoming
+          architectures: amd64 arm64
+          codename: stable
+          components: main
+          signing-key: ${{ secrets.DEB_GPG_PRIVATE_KEY }}
+          # Se hai impostato una passphrase per la chiave, aggiungi:
+          # signing-key-passphrase: ${{ secrets.DEB_GPG_PASSPHRASE }}
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ steps.create-apt-repo.outputs.dir }}
+
+  deploy:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
