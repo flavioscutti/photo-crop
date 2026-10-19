@@ -26,8 +26,14 @@ jobs:
       - name: Copy .deb files
         run: |
           mkdir -p incoming
-          cp linux-amd64/*.deb incoming/ 2>/dev/null || true
-          cp linux-arm64/*.deb incoming/ 2>/dev/null || true
+          echo "Files in linux-amd64:"
+          ls -la linux-amd64/ || true
+          echo "Files in linux-arm64:"
+          ls -la linux-arm64/ || true
+          cp linux-amd64/*.deb incoming/ || { echo "No amd64 .deb found"; exit 1; }
+          cp linux-arm64/*.deb incoming/ || { echo "No arm64 .deb found"; exit 1; }
+          echo "Files in incoming after copy:"
+          ls -la incoming/
 
       - name: Create APT repository
         uses: morph027/apt-repo-action@v3
