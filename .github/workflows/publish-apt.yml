@@ -22,7 +22,6 @@ jobs:
       - name: Download .deb files from Release
         run: |
           mkdir -p incoming
-          # Scarica i .deb allegati alla Release corrente
           gh release download ${{ github.event.release.tag_name }} --pattern "*.deb" --dir incoming
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,8 +36,6 @@ jobs:
           codename: stable
           components: main
           signing-key: ${{ secrets.DEB_GPG_PRIVATE_KEY }}
-          # Se hai impostato una passphrase per la chiave, aggiungi:
-          # signing-key-passphrase: ${{ secrets.DEB_GPG_PASSPHRASE }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
