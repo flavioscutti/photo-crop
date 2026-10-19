@@ -1,11 +1,8 @@
 name: Publish APT Repository
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'linux-amd64/*.deb'
-      - 'linux-arm64/*.deb'
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -23,17 +20,12 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Copy .deb files
+      - name: Download .deb files from Release
         run: |
           mkdir -p incoming
-          echo "Files in linux-amd64:"
-          ls -la linux-amd64/ || true
-          echo "Files in linux-arm64:"
-          ls -la linux-arm64/ || true
-          cp linux-amd64/*.deb incoming/ || { echo "No amd64 .deb found"; exit 1; }
-          cp linux-arm64/*.deb incoming/ || { echo "No arm64 .deb found"; exit 1; }
-          echo "Files in incoming after copy:"
-          ls -la incoming/
+          gh release download --pattern "*.deb" --dir incoming
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create APT repository
         uses: morph027/apt-repo-action@v3
