@@ -37,6 +37,10 @@ jobs:
           components: main
           signing-key: ${{ secrets.DEB_GPG_PRIVATE_KEY }}
 
+      - name: Copy public key to repository
+        run: |
+          cp public.key ${{ steps.create-apt-repo.outputs.dir }}/public.key
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
