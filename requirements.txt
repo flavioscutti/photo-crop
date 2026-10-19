@@ -1,0 +1,14 @@
+# Photo Crop 1.6.7 - Python dependencies
+# Target: Raspberry Pi OS (Debian-based), Python 3
+
+# OpenCV: image loading, rotation, detection. The app never uses cv2's GUI (all the
+# interface is Tkinter), so the headless build is enough and avoids pulling in X11/GTK
+# libraries in the .deb. >= 4.5.4 because load_scan() uses IMREAD_IGNORE_ORIENTATION.
+opencv-python-headless>=4.5.4
+
+# NumPy: arrays and geometry (used directly, and required by OpenCV).
+numpy>=1.21
+
+# Pillow: EXIF header reading, JPEG save with chroma subsampling, previews.
+# >= 9.1 because InteractiveCropDialog uses Image.Resampling (added in 9.1).
+Pillow>=9.1.0
