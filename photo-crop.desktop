@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Photo Crop
-Comment=Batch crop of analog photo scans
-Exec=/usr/bin/photo-crop-launcher
-Icon=photo-crop
-Terminal=false
-Type=Application
-Categories=Graphics;Photography;
