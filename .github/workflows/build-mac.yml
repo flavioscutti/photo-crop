@@ -5,36 +5,59 @@ on:
     types: [published]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-mac:
     runs-on: macos-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: pip
 
-      - name: Install dependencies
+      - name: Installa dipendenze
         run: |
-          pip install -r requirements.txt
-          pip install pyinstaller
+          pip install -r requirements.txt pyinstaller
 
-      - name: Build with PyInstaller
+      - name: Compila app
         run: |
-          pyinstaller --windowed --name "Photo Crop" --add-data ".assets:.assets" photo_crop.py
+          pyinstaller --windowed --name "Photo Crop" \
+            --add-data ".assets:.assets" \
+            photo_crop.py
 
-      - name: Create DMG
+      - name: Calcola versione
+        id: ver
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          echo "dmg=Photo-Crop-${VERSION}.dmg" >> "$GITHUB_OUTPUT"
+
+      - name: Crea DMG
         run: |
           mkdir -p dmg_temp
           cp -R "dist/Photo Crop.app" dmg_temp/
           ln -s /Applications dmg_temp/Applications
-          hdiutil create -volname "Photo Crop" -srcfolder dmg_temp -ov -format UDZO "Photo-Crop-1.6.7.dmg"
+          hdiutil create -volname "Photo Crop" \
+            -srcfolder dmg_temp -ov -format UDZO \
+            "${{ steps.ver.outputs.dmg }}"
 
-      - name: Upload DMG to Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Salva DMG come file scaricabile
+        uses: actions/upload-artifact@v4
         with:
-          files: Photo-Crop-1.6.7.dmg
+          name: macos-dmg
+          path: ${{ steps.ver.outputs.dmg }}
+
+      - name: Allega DMG alla release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.ver.outputs.dmg }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
