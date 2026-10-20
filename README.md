@@ -4,7 +4,9 @@
 
 # Photo Crop
 
-**Batch crop and straighten of analog photo scans, on Raspberry Pi**
+**Batch crop and straighten of analog photo scans**
+
+*Built on Raspberry Pi*
 
 Photo Crop takes the scans of your printed photographs, finds the print on the scanner bed, straightens it, crops it to the paper edge and saves it in the format you want, with the original DPI, ICC profile and metadata preserved. It works in fully automatic mode, in a precision manual mode with zoomed corner and edge inspectors, or in a mix of the two.
 
@@ -25,6 +27,10 @@ Written in Python with Tkinter, OpenCV, Pillow and exiftool. Dark, touchscreen-f
 - [System requirements](#system-requirements)
 - [Files in order of operation](#files-in-order-of-operation)
 - [Quick installation](#quick-installation)
+  - [Raspberry Pi OS, Debian and Ubuntu](#raspberry-pi-os-debian-and-ubuntu)
+  - [From source code](#from-source-code)
+  - [Other Linux distributions](#other-linux-distributions)
+  - [macOS](#macos)
 - [Usage](#usage)
   - [Quick start](#quick-start)
   - [Main window](#main-window)
@@ -105,10 +111,12 @@ Scanning a shoebox of prints usually means scanning one photo at a time, then fi
 
 ## System requirements
 
+The packages (APT repository, `.deb` and DMG) bring what they need. The rows about Python, libraries, exiftool and font matter when you run Photo Crop from the [source code](#from-source-code).
+
 | Requirement | Details |
 |---|---|
 | Hardware | Raspberry Pi (developed and tested on a Raspberry Pi 4 with 8 GB of RAM) or any Linux PC |
-| Operating system | Raspberry Pi OS, or any Debian-based Linux distribution |
+| Operating system | Raspberry Pi OS, any Debian-based Linux distribution (APT repository or `.deb` package), or macOS (self-contained DMG) |
 | Python | Python 3 with Tkinter |
 | Python libraries | OpenCV 4.5.4 or newer (the headless build is enough: the app never uses OpenCV's own GUI, the whole interface is Tkinter), NumPy 1.21 or newer, Pillow 9.1 or newer (with ImageTk) |
 | External tool | exiftool (strongly recommended: needed to copy DPI, ICC profile, EXIF, XMP and to write manual metadata) |
@@ -126,49 +134,75 @@ Scanning a shoebox of prints usually means scanning one photo at a time, then fi
 | 5 | `README.md` | This file |
 | 6 | `LICENSE` | GNU GPL v3.0 |
 
-A ready-to-install **`.deb` package** is published on the [Releases page](https://github.com/flavioscutti/photo-crop/releases/tag/v1.6.7).
+Ready-to-install packages are published on the [Releases page](https://github.com/flavioscutti/photo-crop/releases/tag/v1.6.7): a `.deb` package for Raspberry Pi OS, Debian and Ubuntu (arm64), and a `.dmg` disk image for macOS.
 
 The program creates one file of its own in your home folder: `~/.photo_crop_config.json` (see [Configuration file](#configuration-file)).
 
 ## Quick installation
 
-### Option A: install from the APT repository (recommended)
+Pick the method that fits your system:
+
+| Your system | Recommended method |
+|---|---|
+| Raspberry Pi OS, Debian, Ubuntu | **Option A**, the APT repository: one-time setup, then updates arrive with `apt upgrade` |
+| Same systems, without adding a repository | **Option B**, the `.deb` package: one file to download |
+| Any Linux, or if you want to read or change the code | **Option C**, from source (or **Option D**, by hand) |
+| macOS | **Option E**, the self-contained DMG |
+
+### Raspberry Pi OS, Debian and Ubuntu
+
+#### Option A: install from the APT repository (recommended)
 
 This is the cleanest way to install Photo Crop on Debian, Ubuntu or Raspberry Pi OS. It allows you to receive updates automatically with `sudo apt upgrade`.
 
-Copy and paste the following three commands in a terminal:
+Copy and paste the following three steps in a terminal.
 
-#### 1. Add the GPG key
+**1. Add the GPG key**
+
 ```bash
 curl -fsSL https://flavioscutti.github.io/photo-crop/public.key | sudo gpg --dearmor -o /usr/share/keyrings/photo-crop.gpg
 ```
-#### 2. Add the repository
+
+**2. Add the repository**
+
 ```bash
 echo "deb [signed-by=/usr/share/keyrings/photo-crop.gpg] https://flavioscutti.github.io/photo-crop stable main" | sudo tee /etc/apt/sources.list.d/photo-crop.list
 ```
-#### 3. Install Photo Crop
+
+**3. Install Photo Crop**
+
 ```bash
 sudo apt update
 sudo apt install photo-crop
 ```
-Photo Crop is now installed and appears in the Graphics menu. To update it in the future, simply run:
+
+Photo Crop is now installed and appears in the **Graphics** menu. On some systems the menu refreshes only after logging out and back in, or after a reboot. To update it in the future, simply run:
 
 ```bash
 sudo apt update && sudo apt upgrade
 ```
 
-### Option B: install the .deb package
+#### Option B: install the .deb package
 
-Download the `.deb` file from the [v1.6.7 release](https://github.com/flavioscutti/photo-crop/releases/tag/v1.6.7), then install it with `apt` so that the dependencies are resolved automatically:
+Use this if you prefer to download a single file instead of adding a repository. The package is built for 64-bit systems (**arm64**), such as Raspberry Pi OS 64-bit on a Raspberry Pi 4.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| [photo-crop_1.6.8_arm64.deb](https://github.com/flavioscutti/photo-crop/releases/download/v1.6.7/photo-crop_1.6.8_arm64.deb) | 55.7 MB | `47e1844e88e6f265f4b844f737091298b92ec65815edeba3f51713cb61eed759` |
+
+Download it, optionally verify the checksum, and install it with `apt` so that the dependencies are resolved automatically:
 
 ```bash
 cd ~/Downloads
-sudo apt install ./photo-crop_*.deb
+sha256sum photo-crop_1.6.8_arm64.deb
+sudo apt install ./photo-crop_1.6.8_arm64.deb
 ```
 
-Photo Crop then appears in the **Graphics** menu. On some systems the menu refreshes only after logging out and back in, or after a reboot.
+The `sha256sum` output must match the value in the table. Photo Crop then appears in the **Graphics** menu. Packages installed this way are not updated automatically: to upgrade, download the new `.deb` and install it again, or switch to Option A.
 
-### Option C: run from the source code
+### From source code
+
+#### Option C: clone the repository
 
 ```bash
 git clone https://github.com/flavioscutti/photo-crop.git
@@ -185,7 +219,7 @@ cd ~/photo-crop
 git pull
 ```
 
-### Option D: create the files by hand
+#### Option D: create the files by hand
 
 Install the dependencies:
 
@@ -218,6 +252,37 @@ Install the same components with your package manager.
 | Arch Linux | `sudo pacman -S tk python-opencv python-numpy python-pillow perl-image-exiftool inter-font` |
 
 If your distribution does not provide a package, `pip install "opencv-python-headless>=4.5.4" "numpy>=1.21" "Pillow>=9.1.0"` also works. Without the Inter font Tkinter falls back to a default font and the layout may look slightly different.
+
+---
+
+### macOS
+
+#### Option E: install the DMG
+
+The DMG is self-contained: Python and the libraries Photo Crop needs are bundled inside the application, so there is nothing else to install.
+
+| File | Size | SHA-256 |
+|---|---|---|
+| [photo-crop_1.6.7.dmg](https://github.com/flavioscutti/photo-crop/releases/download/v1.6.7/photo-crop_1.6.7.dmg) | 71.8 MB | `45f4d2cc8b4c3aef6bb49cc2e9249a7a24c4b535c4bec665165d6eccc05bddf8` |
+
+1. **Download** `photo-crop_1.6.7.dmg` from the link above, or from the [Releases page](https://github.com/flavioscutti/photo-crop/releases/tag/v1.6.7) (the file is listed among the release assets).
+2. **Verify the download** (optional but recommended). In Terminal:
+
+   ```bash
+   cd ~/Downloads
+   shasum -a 256 photo-crop_1.6.7.dmg
+   ```
+
+   The output must match the SHA-256 in the table.
+3. **Open the disk image** by double-clicking the `.dmg` file.
+4. **Drag Photo Crop into the Applications folder**, then eject the disk image.
+5. **Start Photo Crop** from the Applications folder or from Launchpad.
+
+If macOS shows a security warning on the first launch, Control-click (or right-click) the application, choose **Open**, and confirm. Alternatively, open **System Settings**, go to **Privacy & Security**, and use **Open Anyway** next to the message about Photo Crop.
+
+Settings are stored in `~/.photo_crop_config.json` in your home folder, exactly as on Linux.
+
+---
 
 ## Usage
 
@@ -714,10 +779,11 @@ If the file is missing, incomplete or damaged, the program fills the gaps with t
 ## Compatibility
 
 - Developed and tested on a **Raspberry Pi 4 (8 GB)** with Raspberry Pi OS, with mouse, keyboard and touchscreen.
-- Should run on any Linux desktop that provides the dependencies listed in [System requirements](#system-requirements).
+- Packages for **Raspberry Pi OS, Debian and Ubuntu** (APT repository and `.deb`, arm64) and for **macOS** (self-contained DMG).
+- From source, it should run on any Linux desktop that provides the dependencies listed in [System requirements](#system-requirements).
 - Input: JPEG, PNG, TIFF, BMP (8 and 16 bit). Output: JPEG, TIFF, PNG, and BMP only through "Same as original".
 - TIFF compression selection requires an OpenCV build that exposes the TIFF compression option; everything else works without it.
-- The code is prepared to run as a PyInstaller bundle (assets and exiftool are looked up next to the executable).
+- The code is prepared to run as a bundled application (assets and exiftool are looked up next to the executable), which is how the self-contained DMG works.
 
 ## Notes and troubleshooting
 
@@ -727,7 +793,9 @@ If the file is missing, incomplete or damaged, the program fills the gaps with t
 - **"exiftool not found" in the log.** Install it with `sudo apt install libimage-exiftool-perl`. Until then DPI, ICC profile, EXIF and manual metadata are not written.
 - **The TIFF compression slider is disabled.** Your OpenCV build cannot set it; TIFF files are still saved with the library default.
 - **16-bit scan saved as JPEG looks different in file size.** JPEG is 8-bit only; the conversion happens automatically.
-- **The menu entry is not visible.** Log out and back in, or reboot.
+- **The menu entry is not visible (Linux).** Log out and back in, or reboot.
+- **macOS does not open the app on the first launch.** Control-click the application, choose **Open** and confirm; or use **Open Anyway** in **System Settings > Privacy & Security**.
+- **The checksum does not match.** Download the file again; if it still differs, do not install it and open an issue.
 - **Font looks different.** Install `fonts-inter`.
 - **Settings behave strangely.** Delete `~/.photo_crop_config.json` to restore defaults.
 
