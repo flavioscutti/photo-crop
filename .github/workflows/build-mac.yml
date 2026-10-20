@@ -24,7 +24,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --windowed --name "Photo Crop" --add-data ".assets:.assets" photo_crop_1.6.7.py
+          pyinstaller --windowed --name "Photo Crop" --add-data ".assets:.assets" photo_crop.py
 
       - name: Create DMG
         run: |
