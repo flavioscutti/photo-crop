@@ -1,0 +1,40 @@
+name: Build macOS DMG
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --windowed --name "Photo Crop" --add-data ".assets:.assets" photo_crop_1.6.7.py
+
+      - name: Create DMG
+        run: |
+          mkdir -p dmg_temp
+          cp -R "dist/Photo Crop.app" dmg_temp/
+          ln -s /Applications dmg_temp/Applications
+          hdiutil create -volname "Photo Crop" -srcfolder dmg_temp -ov -format UDZO "Photo-Crop-1.6.7.dmg"
+
+      - name: Upload DMG to Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: Photo-Crop-1.6.7.dmg
