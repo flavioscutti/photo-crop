@@ -4,7 +4,7 @@
 
 # Photo Crop
 
-**Batch crop and straighten of analog photo scans, on Raspberry Pi.**
+**Batch crop and straighten of analog photo scans, on Raspberry Pi**
 
 Photo Crop takes the scans of your printed photographs, finds the print on the scanner bed, straightens it, crops it to the paper edge and saves it in the format you want, with the original DPI, ICC profile and metadata preserved. It works in fully automatic mode, in a precision manual mode with zoomed corner and edge inspectors, or in a mix of the two.
 
